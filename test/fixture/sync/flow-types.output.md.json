@@ -13,16 +13,7 @@
           "type": "text",
           "value": "addThem"
         }
-      ],
-      "data": {
-        "id": "addthem",
-        "htmlAttributes": {
-          "id": "addthem"
-        },
-        "hProperties": {
-          "id": "addthem"
-        }
-      }
+      ]
     },
     {
       "type": "paragraph",
@@ -355,16 +346,7 @@
           "type": "text",
           "value": "Point"
         }
-      ],
-      "data": {
-        "id": "point",
-        "htmlAttributes": {
-          "id": "point"
-        },
-        "hProperties": {
-          "id": "point"
-        }
-      }
+      ]
     },
     {
       "type": "paragraph",
@@ -916,16 +898,7 @@
           "type": "text",
           "value": "Two"
         }
-      ],
-      "data": {
-        "id": "two",
-        "htmlAttributes": {
-          "id": "two"
-        },
-        "hProperties": {
-          "id": "two"
-        }
-      }
+      ]
     },
     {
       "type": "paragraph",
@@ -1177,16 +1150,7 @@
           "type": "text",
           "value": "T"
         }
-      ],
-      "data": {
-        "id": "t",
-        "htmlAttributes": {
-          "id": "t"
-        },
-        "hProperties": {
-          "id": "t"
-        }
-      }
+      ]
     },
     {
       "type": "paragraph",
@@ -1270,16 +1234,7 @@
           "type": "text",
           "value": "T"
         }
-      ],
-      "data": {
-        "id": "t-1",
-        "htmlAttributes": {
-          "id": "t-1"
-        },
-        "hProperties": {
-          "id": "t-1"
-        }
-      }
+      ]
     },
     {
       "type": "paragraph",
@@ -1344,16 +1299,7 @@
           "type": "text",
           "value": "veryImportantTransform"
         }
-      ],
-      "data": {
-        "id": "veryimportanttransform",
-        "htmlAttributes": {
-          "id": "veryimportanttransform"
-        },
-        "hProperties": {
-          "id": "veryimportanttransform"
-        }
-      }
+      ]
     },
     {
       "type": "paragraph",
@@ -1558,16 +1504,7 @@
           "type": "text",
           "value": "optionalFunc"
         }
-      ],
-      "data": {
-        "id": "optionalfunc",
-        "htmlAttributes": {
-          "id": "optionalfunc"
-        },
-        "hProperties": {
-          "id": "optionalfunc"
-        }
-      }
+      ]
     },
     {
       "type": "paragraph",
@@ -1686,16 +1623,7 @@
           "type": "text",
           "value": "objectParamFn"
         }
-      ],
-      "data": {
-        "id": "objectparamfn",
-        "htmlAttributes": {
-          "id": "objectparamfn"
-        },
-        "hProperties": {
-          "id": "objectparamfn"
-        }
-      }
+      ]
     },
     {
       "type": "paragraph",
@@ -1805,16 +1733,7 @@
           "type": "text",
           "value": "objectParamFn"
         }
-      ],
-      "data": {
-        "id": "objectparamfn-1",
-        "htmlAttributes": {
-          "id": "objectparamfn-1"
-        },
-        "hProperties": {
-          "id": "objectparamfn-1"
-        }
-      }
+      ]
     },
     {
       "type": "paragraph",
@@ -1925,16 +1844,7 @@
           "type": "text",
           "value": "SomeObjectAPI"
         }
-      ],
-      "data": {
-        "id": "someobjectapi",
-        "htmlAttributes": {
-          "id": "someobjectapi"
-        },
-        "hProperties": {
-          "id": "someobjectapi"
-        }
-      }
+      ]
     },
     {
       "type": "paragraph",

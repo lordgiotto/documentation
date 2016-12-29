@@ -11,7 +11,7 @@ var fs = require('fs'),
   createLinkerStack = require('../').util.createLinkerStack,
   hljs = require('highlight.js');
 
-module.exports = function (comments, options, callback) {
+module.exports = function (comments, options) {
 
   var linkerStack = createLinkerStack(options)
     .namespaceResolver(comments, function (namespace) {
@@ -79,14 +79,16 @@ module.exports = function (comments, options, callback) {
   var pageTemplate = _.template(fs.readFileSync(path.join(__dirname, 'index._'), 'utf8'),  sharedImports);
 
   // push assets into the pipeline as well.
-  vfs.src([__dirname + '/assets/**'], { base: __dirname })
-    .pipe(concat(function (files) {
-      callback(null, files.concat(new File({
-        path: 'index.html',
-        contents: new Buffer(pageTemplate({
-          docs: comments,
-          options: options
-        }), 'utf8')
-      })));
-    }));
+  return new Promise(resolve => {
+    vfs.src([__dirname + '/assets/**'], { base: __dirname })
+      .pipe(concat(function (files) {
+        resolve(files.concat(new File({
+          path: 'index.html',
+          contents: new Buffer(pageTemplate({
+            docs: comments,
+            options: options
+          }), 'utf8')
+        })));
+      }));
+  });
 };

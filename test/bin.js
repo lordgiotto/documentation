@@ -122,6 +122,14 @@ test('accepts config file - reports failures', options, function (t) {
     }, false);
 });
 
+test('accepts config file - reports parse failures', options, function (t) {
+  documentation(['build fixture/sorting/input.js -c fixture/config-malformed.json'], {},
+    function (err, data, stderr) {
+      t.match(stderr, /SyntaxError/g, 'Reports a SyntaxError with bad config');
+      t.end();
+    }, false);
+});
+
 test('--shallow option', function (t) {
   documentation(['build --shallow fixture/internal.input.js'], function (err, data) {
     t.error(err);

@@ -13,16 +13,7 @@
           "type": "text",
           "value": "cheese"
         }
-      ],
-      "data": {
-        "id": "cheese",
-        "htmlAttributes": {
-          "id": "cheese"
-        },
-        "hProperties": {
-          "id": "cheese"
-        }
-      }
+      ]
     },
     {
       "type": "paragraph",

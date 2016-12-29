@@ -13,16 +13,7 @@
           "type": "text",
           "value": "nixon"
         }
-      ],
-      "data": {
-        "id": "nixon",
-        "htmlAttributes": {
-          "id": "nixon"
-        },
-        "hProperties": {
-          "id": "nixon"
-        }
-      }
+      ]
     },
     {
       "type": "paragraph",

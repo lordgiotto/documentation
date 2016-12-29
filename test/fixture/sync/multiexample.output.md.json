@@ -13,16 +13,7 @@
           "type": "text",
           "value": "multiexample.input"
         }
-      ],
-      "data": {
-        "id": "multiexampleinput",
-        "htmlAttributes": {
-          "id": "multiexampleinput"
-        },
-        "hProperties": {
-          "id": "multiexampleinput"
-        }
-      }
+      ]
     },
     {
       "type": "paragraph",

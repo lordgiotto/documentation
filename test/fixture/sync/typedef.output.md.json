@@ -13,16 +13,7 @@
           "type": "text",
           "value": "MyType"
         }
-      ],
-      "data": {
-        "id": "mytype",
-        "htmlAttributes": {
-          "id": "mytype"
-        },
-        "hProperties": {
-          "id": "mytype"
-        }
-      }
+      ]
     },
     {
       "type": "paragraph",

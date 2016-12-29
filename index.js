@@ -24,7 +24,7 @@ var fs = require('fs'),
   garbageCollect = require('./lib/garbage_collect'),
   lintComments = require('./lib/lint').lintComments,
   markdownAST = require('./lib/output/markdown_ast'),
-  loadConfig = require('./lib/load_config');
+  mergeConfig = require('./lib/merge_config');
 
 var parseExtensions = ['js', 'jsx', 'es5', 'es6'];
 
@@ -37,7 +37,7 @@ var parseExtensions = ['js', 'jsx', 'es5', 'es6'];
  */
 function pipeline() {
   var elements = arguments;
-  return function (comment) {
+  return comment => {
     for (var i = 0; comment && i < elements.length; i++) {
       if (elements[i]) {
         comment = elements[i](comment);
@@ -53,32 +53,15 @@ function pipeline() {
  *
  * @param {Array<string>|string} indexes files to process
  * @param {Object} options options
- * @param {Function} callback called with results
- * @returns {undefined}
+ * @returns {Promise} promise with results
  */
-function expandInputs(indexes, options, callback) {
-  var inputFn;
-  if (options.polyglot || options.shallow || options.documentExported) {
-    inputFn = shallow;
-  } else {
-    inputFn = dependency;
-  }
+function expandInputs(indexes, options) {
   options.parseExtensions = parseExtensions
     .concat(options.parseExtension || []);
-  inputFn(indexes, options, callback);
-}
-
-/**
- * Given an options object, it expands the `config` field
- * if it exists.
- *
- * @param {Object} options - options to process
- * @returns {undefined}
- */
-function expandConfig(options) {
-  if (options && typeof options.config === 'string') {
-    Object.assign(options, loadConfig(options.config));
+  if (options.polyglot || options.shallow || options.documentExported) {
+    return shallow(indexes, options);
   }
+  return dependency(indexes, options);
 }
 
 /**
@@ -86,70 +69,51 @@ function expandConfig(options) {
  * comments, given a root file as a path.
  *
  * @param {Array<string>|string} indexes files to process
- * @param {Object} options options
- * @param {Array<string>} options.external a string regex / glob match pattern
+ * @param {Object} args args
+ * @param {Array<string>} args.external a string regex / glob match pattern
  * that defines what external modules will be whitelisted and included in the
  * generated documentation.
- * @param {boolean} [options.polyglot=false] parse comments with a regex rather than
+ * @param {boolean} [args.polyglot=false] parse comments with a regex rather than
  * a proper parser. This enables support of non-JavaScript languages but
  * reduces documentation's ability to infer structure of code.
- * @param {boolean} [options.shallow=false] whether to avoid dependency parsing
+ * @param {boolean} [args.shallow=false] whether to avoid dependency parsing
  * even in JavaScript code. With the polyglot option set, this has no effect.
- * @param {Array<string|Object>} [options.order=[]] optional array that
+ * @param {Array<string|Object>} [args.order=[]] optional array that
  * defines sorting order of documentation
- * @param {Array<string>} [options.access=[]] an array of access levels
+ * @param {Array<string>} [args.access=[]] an array of access levels
  * to output in documentation
- * @param {Object} [options.hljs] hljs optional options
- * @param {boolean} [options.hljs.highlightAuto=false] hljs automatically detect language
- * @param {Array} [options.hljs.languages] languages for hljs to choose from
- * @param {string} [options.inferPrivate] a valid regular expression string
+ * @param {Object} [args.hljs] hljs optional args
+ * @param {boolean} [args.hljs.highlightAuto=false] hljs automatically detect language
+ * @param {Array} [args.hljs.languages] languages for hljs to choose from
+ * @param {string} [args.inferPrivate] a valid regular expression string
  * to infer whether a code element should be private, given its naming structure.
  * For instance, you can specify `inferPrivate: '^_'` to automatically treat
  * methods named like `_myMethod` as private.
- * @param {string|Array<string>} [options.extension] treat additional file extensions
+ * @param {string|Array<string>} [args.extension] treat additional file extensions
  * as JavaScript, extending the default set of `js`, `es6`, and `jsx`.
- * @param {Function} callback to be called when the documentation generation
- * is complete, with (err, result) argumentsj
- * @returns {undefined} calls callback
+ * @returns {Promise} results
  * @public
  * @example
  * var documentation = require('documentation');
  *
  * documentation.build(['index.js'], {
- *
  *   // only output comments with an explicit @public tag
  *   access: ['public']
- *
- * }, function (err, res) {
- *
+ * }).then(res => {
  *   // res is an array of parsed comments with inferred properties
  *   // and more: everything you need to build documentation or
  *   // any other kind of code data.
- *
  * });
  */
-function build(indexes, options, callback) {
-  options = options || {};
-
-  expandConfig(options);
+function build(indexes, args) {
+  var options = mergeConfig(args);
 
   if (typeof indexes === 'string') {
     indexes = [indexes];
   }
 
-  return expandInputs(indexes, options, function (error, inputs) {
-    if (error) {
-      return callback(error);
-    }
-
-    var result;
-    try {
-      result = buildSync(inputs, options);
-    } catch (e) {
-      return callback(e);
-    }
-    callback(null, result);
-  });
+  return expandInputs(indexes, options).then(inputs =>
+    buildSync(inputs, options));
 }
 
 /**
@@ -158,28 +122,28 @@ function build(indexes, options, callback) {
  * synchronously, rather than by calling a callback.
  *
  * @param {Array<string>} indexes files to process
- * @param {Object} options options
+ * @param {Object} args args
  * @param {string} config path to configuration file to load
- * @param {Array<string>} options.external a string regex / glob match pattern
+ * @param {Array<string>} args.external a string regex / glob match pattern
  * that defines what external modules will be whitelisted and included in the
  * generated documentation.
- * @param {boolean} [options.polyglot=false] parse comments with a regex rather than
+ * @param {boolean} [args.polyglot=false] parse comments with a regex rather than
  * a proper parser. This enables support of non-JavaScript languages but
  * reduces documentation's ability to infer structure of code.
- * @param {boolean} [options.shallow=false] whether to avoid dependency parsing
+ * @param {boolean} [args.shallow=false] whether to avoid dependency parsing
  * even in JavaScript code. With the polyglot option set, this has no effect.
- * @param {Array<string|Object>} [options.order=[]] optional array that
+ * @param {Array<string|Object>} [args.order=[]] optional array that
  * defines sorting order of documentation
- * @param {Array<string>} [options.access=[]] an array of access levels
+ * @param {Array<string>} [args.access=[]] an array of access levels
  * to output in documentation
- * @param {Object} [options.hljs] hljs optional options
- * @param {boolean} [options.hljs.highlightAuto=false] hljs automatically detect language
- * @param {Array} [options.hljs.languages] languages for hljs to choose from
- * @param {string} [options.inferPrivate] a valid regular expression string
+ * @param {Object} [args.hljs] hljs optional args
+ * @param {boolean} [args.hljs.highlightAuto=false] hljs automatically detect language
+ * @param {Array} [args.hljs.languages] languages for hljs to choose from
+ * @param {string} [args.inferPrivate] a valid regular expression string
  * to infer whether a code element should be private, given its naming structure.
  * For instance, you can specify `inferPrivate: '^_'` to automatically treat
  * methods named like `_myMethod` as private.
- * @param {string|Array<string>} [options.extension] treat additional file extensions
+ * @param {string|Array<string>} [args.extension] treat additional file extensions
  * as JavaScript, extending the default set of `js`, `es6`, and `jsx`.
  * @returns {Object} list of results
  * @public
@@ -191,11 +155,8 @@ function build(indexes, options, callback) {
  * // and more: everything you need to build documentation or
  * // any other kind of code data.
  */
-function buildSync(indexes, options) {
-  options = options || {};
-  options.hljs = options.hljs || {};
-
-  expandConfig(options);
+function buildSync(indexes, args) {
+  var options = mergeConfig(args);
 
   if (!options.access) {
     options.access = ['public', 'undefined', 'protected'];
@@ -243,30 +204,25 @@ function buildSync(indexes, options) {
  * of lint information intended for human-readable output.
  *
  * @param {Array<string>|string} indexes files to process
- * @param {Object} options options
- * @param {Array<string>} options.external a string regex / glob match pattern
+ * @param {Object} args args
+ * @param {Array<string>} args.external a string regex / glob match pattern
  * that defines what external modules will be whitelisted and included in the
  * generated documentation.
- * @param {boolean} [options.polyglot=false] parse comments with a regex rather than
+ * @param {boolean} [args.polyglot=false] parse comments with a regex rather than
  * a proper parser. This enables support of non-JavaScript languages but
  * reduces documentation's ability to infer structure of code.
- * @param {boolean} [options.shallow=false] whether to avoid dependency parsing
+ * @param {boolean} [args.shallow=false] whether to avoid dependency parsing
  * even in JavaScript code. With the polyglot option set, this has no effect.
- * @param {string} [options.inferPrivate] a valid regular expression string
+ * @param {string} [args.inferPrivate] a valid regular expression string
  * to infer whether a code element should be private, given its naming structure.
  * For instance, you can specify `inferPrivate: '^_'` to automatically treat
  * methods named like `_myMethod` as private.
- * @param {string|Array<string>} [options.extension] treat additional file extensions
+ * @param {string|Array<string>} [args.extension] treat additional file extensions
  * as JavaScript, extending the default set of `js`, `es6`, and `jsx`.
- * @param {Function} callback to be called when the documentation generation
- * is complete, with (err, result) arguments
- * @returns {undefined} calls callback
+ * @returns {Promise} promise with lint results
  * @public
  * @example
- * documentation.lint('file.js', {}, function (err, lintOutput) {
- *   if (err) {
- *     throw err;
- *   }
+ * documentation.lint('file.js').then(lintOutput => {
  *   if (lintOutput) {
  *     console.log(lintOutput);
  *     process.exit(1);
@@ -275,10 +231,8 @@ function buildSync(indexes, options) {
  *   }
  * });
  */
-function lint(indexes, options, callback) {
-  options = options || {};
-
-  expandConfig(options);
+function lint(indexes, args) {
+  var options = mergeConfig(args);
 
   if (typeof indexes === 'string') {
     indexes = [indexes];
@@ -299,23 +253,17 @@ function lint(indexes, options, callback) {
     inferType(),
     nest);
 
-  return expandInputs(indexes, options, function (error, inputs) {
-    if (error) {
-      return callback(error);
-    }
-    callback(null,
-      formatLint(hierarchy(
-        inputs
-          .reduce(function (memo, file) {
-            return memo.concat(parseFn(file, options).map(lintPipeline));
-          }, [])
-          .filter(Boolean))));
-  });
+  return expandInputs(indexes, options).then(inputs =>
+    formatLint(hierarchy(
+      inputs
+        .reduce((memo, file) =>
+          memo.concat(parseFn(file, options).map(lintPipeline)), [])
+        .filter(Boolean))));
 }
 
 /**
  * Documentation's formats are modular methods that take comments
- * and options as input and call a callback with writable objects,
+ * and options as input and return Promises with results,
  * like stringified JSON, markdown strings, or Vinyl objects for HTML
  * output.
  * @public
@@ -323,11 +271,9 @@ function lint(indexes, options, callback) {
 var formats = {
   html: require('./lib/output/html'),
   md: require('./lib/output/markdown'),
-  remark: function (comments, options, callback) {
-    markdownAST(comments, options, function (err, res) {
-      callback(err, JSON.stringify(res, null, 2));
-    });
-  },
+  remark: (comments, options) =>
+    markdownAST(comments, options)
+      .then(res => JSON.stringify(res, null, 2)),
   json: require('./lib/output/json')
 };
 

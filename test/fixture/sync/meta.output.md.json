@@ -13,16 +13,7 @@
           "type": "text",
           "value": "dewey"
         }
-      ],
-      "data": {
-        "id": "dewey",
-        "htmlAttributes": {
-          "id": "dewey"
-        },
-        "hProperties": {
-          "id": "dewey"
-        }
-      }
+      ]
     },
     {
       "type": "paragraph",

@@ -13,16 +13,7 @@
           "type": "text",
           "value": "fooBar"
         }
-      ],
-      "data": {
-        "id": "foobar",
-        "htmlAttributes": {
-          "id": "foobar"
-        },
-        "hProperties": {
-          "id": "foobar"
-        }
-      }
+      ]
     },
     {
       "type": "paragraph",
@@ -131,16 +122,7 @@
           "type": "text",
           "value": "fooBaz"
         }
-      ],
-      "data": {
-        "id": "foobaz",
-        "htmlAttributes": {
-          "id": "foobaz"
-        },
-        "hProperties": {
-          "id": "foobaz"
-        }
-      }
+      ]
     },
     {
       "type": "paragraph",
@@ -249,16 +231,7 @@
           "type": "text",
           "value": "Something"
         }
-      ],
-      "data": {
-        "id": "something",
-        "htmlAttributes": {
-          "id": "something"
-        },
-        "hProperties": {
-          "id": "something"
-        }
-      }
+      ]
     },
     {
       "type": "paragraph",
